@@ -2,16 +2,13 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from djmoney.models.fields import MoneyField
-
-
-
-
+from django.db.models.signals import post_save
 
 class Organizacion(models.Model):
     usuario = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     nombre = models.CharField(max_length=200, blank=False, null=False)
     fecha_alta = models.DateField('fecha de alta')
-
+    tyc_leido = models.BooleanField(blank=False, null=False, default=False)
     
 
     class Meta:
@@ -44,6 +41,20 @@ class CampoCustomTipoCuenta(models.Model):
     def __str__(self):
         return (self.tipo) 
 
+class CampoCustomEstadoOportunidad(models.Model):
+    organizacion = models.ForeignKey(Organizacion, on_delete=models.CASCADE)
+    estado = models.CharField(max_length=50, default=None, blank=True, null=True)
+
+    def __str__(self):
+        return (self.estado)
+
+class CampoCustomTipoOportunidad(models.Model):
+    organizacion = models.ForeignKey(Organizacion, on_delete=models.CASCADE)
+    tipo = models.CharField(max_length=50, default=None, blank=True, null=True)
+
+    def __str__(self):
+        return (self.tipo)
+
 #####################################################
 ###########     CAMPOS CUSTOMIZABLES    #############
 #####################################################      
@@ -63,7 +74,7 @@ class Cuenta(models.Model):
 
     tipo = models.ForeignKey(
             CampoCustomTipoCuenta,
-            on_delete=models.CASCADE,
+            on_delete=models.PROTECT,
             blank=True,
             null=True
         )
@@ -92,11 +103,22 @@ class Contacto(models.Model):
 
     ocupacion = models.CharField(max_length=200, default=None, blank=True, null=True)
 
-    calle = models.CharField(max_length=200 ,default=None, blank=True, null=True)
-    numero = models.CharField(max_length=10, default=None, blank=True, null=True)
+    direccion = models.CharField(max_length=200 ,default=None, blank=True, null=True)
     ciudad = models.CharField(max_length=200, default=None, blank=True, null=True)
     cod_postal = models.CharField(max_length=10, default=None, blank=True, null=True)
-    pais = models.CharField(max_length=200, default=None, blank=True, null=True)
+    
+    PAISES = [
+        (0,'Argentina'),
+        (1,'Ecuador'),
+        (2,'Peru'),
+        (3,'Venezuela'),
+        (4,'Mexico'),
+        (5,'Panama'),
+        (6,'Chile'),
+        (7,'Uruguay'),
+    ]
+
+    pais = models.IntegerField(choices=PAISES, default=None, blank=True, null=True)
 
 
     fecha_de_nacimiento = models.DateField('fecha de nacimiento')
@@ -113,7 +135,7 @@ class Contacto(models.Model):
     #LO CAMBIO A CATEGORIA DE FORMA PROVISORIA
     categoria = models.ForeignKey(
             CampoCustomTipoContacto,
-            on_delete=models.CASCADE,
+            on_delete=models.PROTECT,
             blank=True,
             null=True
         )
@@ -132,7 +154,7 @@ class Contacto(models.Model):
 
     origen = models.ForeignKey(
             CampoCustomOrigen,
-            on_delete=models.CASCADE,
+            on_delete=models.PROTECT,
             blank=True,
             null=True
     )
@@ -251,14 +273,61 @@ class Voluntario(models.Model):
 
     habilidades = models.IntegerField(choices=LISTA_HABILIDADES, blank=True, null=True)    
 
+class Oportunidad(models.Model):
+    cuenta = models.ForeignKey(Cuenta, on_delete=models.CASCADE, blank=False)
+    nombre = models.CharField(max_length=200, default=None, blank=False, null=False)
+    
+    #estado_oportunidad = models.CharField(max_length=200, default=None, blank=False, null=False)
+    estado_oportunidad = models.ForeignKey(
+            CampoCustomEstadoOportunidad,
+            on_delete=models.PROTECT,
+            blank=False,
+            null=False
+    )
+
+    #tipo = models.CharField(max_length=200, default=None, blank=False, null=False)
+    tipo = models.ForeignKey(
+            CampoCustomTipoOportunidad,
+            on_delete=models.PROTECT,
+            blank=False,
+            null=False
+    )
+
+    fecha = models.DateField('fecha de nacimiento')
+    monto = MoneyField(max_digits=14, decimal_places=2, default_currency='ARS', default=0, blank=True)
+    observaciones = models.TextField(default= None, blank=True, null=True)
+
+# Al crear una nueva organizacion, entra aca para crear los campos custom default
+def crear_customs(sender, instance, created, **kwargs):
+     if instance and created: 
+         # Campos Origen Custom DEFAULT
+         CampoCustomOrigen(organizacion=instance, origen="Llamado").save()
+         CampoCustomOrigen(organizacion=instance, origen="Mail").save()
+         CampoCustomOrigen(organizacion=instance, origen="Reunion").save()
+         CampoCustomOrigen(organizacion=instance, origen="Evento").save()
+
+         # Campos Tipo Contacto Custom DEFAULT
+         CampoCustomTipoContacto(organizacion=instance, tipo="General").save()
+         CampoCustomTipoContacto(organizacion=instance, tipo="Staff").save()
+         CampoCustomTipoContacto(organizacion=instance, tipo="Socio").save()
+
+         # Campos Tipo Cuenta Custom DEFAULT
+         CampoCustomTipoCuenta(organizacion=instance, tipo="ONG").save()
+         CampoCustomTipoCuenta(organizacion=instance, tipo="Empresa").save()
+         CampoCustomTipoCuenta(organizacion=instance, tipo="Gobierno").save()
+         CampoCustomTipoCuenta(organizacion=instance, tipo="General").save()
+
+         # Campos Estado Custom DEFAULT
+         CampoCustomEstadoOportunidad(organizacion=instance, estado="Abierta").save()
+         CampoCustomEstadoOportunidad(organizacion=instance, estado="En Proceso").save()
+         CampoCustomEstadoOportunidad(organizacion=instance, estado="Cerrada").save()
+
+         # Campos Tipo Oportunidad Custom DEFAULT
+         CampoCustomTipoOportunidad(organizacion=instance, tipo="Donación").save()
+         CampoCustomTipoOportunidad(organizacion=instance, tipo="Servicio").save()
+         CampoCustomTipoOportunidad(organizacion=instance, tipo="Proyecto").save()
 
 
 
 
-
-
-
-
-
-
-
+post_save.connect(crear_customs, sender=Organizacion)

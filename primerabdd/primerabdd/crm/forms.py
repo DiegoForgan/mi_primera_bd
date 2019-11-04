@@ -1,4 +1,4 @@
-from .models import Organizacion, Cuenta, Contacto, Voluntario, CampoCustomOrigen, CampoCustomTipoContacto, CampoCustomTipoCuenta
+from .models import Organizacion, Cuenta, Contacto, Voluntario, Oportunidad, CampoCustomOrigen, CampoCustomTipoContacto, CampoCustomTipoCuenta, CampoCustomTipoOportunidad, CampoCustomEstadoOportunidad
 from django import forms
 from django.forms import ModelForm, CheckboxInput
 
@@ -23,6 +23,8 @@ class ContactoCrearForm(ModelForm):
             'estado': Select2Widget(attrs={'data-placeholder':"Estado"}),
             'turno': Select2Widget(attrs={'data-placeholder':"Turno"}),
             'habilidades': Select2Widget(attrs={'data-placeholder':"Habilidades"}),
+            'pais': Select2Widget(attrs={'data-placeholder':"Pais"}),
+
         }
 
     def __init__(self, *args, **kwargs):
@@ -39,6 +41,21 @@ class CuentaCrearForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(CuentaCrearForm, self).__init__(*args, **kwargs)
+
+class OportunidadCrearForm(ModelForm):
+    class Meta:
+        model = Oportunidad
+        fields = '__all__'
+
+        widgets = {
+            'tipo': Select2Widget(attrs={'data-placeholder':"Tipo"}),
+            'estado_oportunidad': Select2Widget(attrs={'data-placeholder':"Estado"}),
+            'cuenta': Select2Widget(attrs={'data-placeholder':"Cuenta"}),
+            'fecha': DateInput()
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(OportunidadCrearForm, self).__init__(*args, **kwargs)
 
 class CampoCustomCrearOrigenForm(ModelForm):
     class Meta:
@@ -63,3 +80,27 @@ class CampoCustomCrearTipoCuentaForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(CampoCustomCrearTipoCuentaForm, self).__init__(*args, **kwargs)
+
+class CampoCustomCrearEstadoOportunidadForm(ModelForm):
+    class Meta:
+        model = CampoCustomEstadoOportunidad
+        exclude = ['organizacion']
+
+        widgets={
+            'estado': forms.TextInput(attrs={'id': 'estado_custom_oportunidad'})
+        }
+        
+
+    def __init__(self, *args, **kwargs):
+        super(CampoCustomCrearEstadoOportunidadForm, self).__init__(*args, **kwargs)
+
+class CampoCustomCrearTipoOportunidadForm(ModelForm):
+    class Meta:
+        model = CampoCustomTipoOportunidad
+        exclude = ['organizacion']
+
+    def __init__(self, *args, **kwargs):
+        super(CampoCustomCrearTipoOportunidadForm, self).__init__(*args, **kwargs)
+
+
+

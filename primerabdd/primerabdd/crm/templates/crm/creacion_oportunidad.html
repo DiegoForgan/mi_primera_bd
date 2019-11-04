@@ -12,6 +12,15 @@
         width: 50%;
     }
 
+    #id_monto_0 {
+        width: 20%;
+    }
+
+    #id_monto_1 {
+        width: 70%;
+        height: 53%;
+    }
+
     p {
         margin-top: 10px;
         margin-bottom: 5px;
@@ -32,60 +41,41 @@
 
     <div class="row">
         <div class="col-lg-4">
+            {{ form.nombre.errors }}
             <label for="{{ form.nombre.id_for_label }}">Nombre *</label>
             {{ form.nombre }}
         </div>
 
         <div class="col-lg-4">
-            {{ form.calle.errors }}
-            <label for="{{ form.calle.id_for_label }}">Dirección</label><br>
-            {{ form.calle }}
-        </div>
-
-        <div class="col-lg-4">
-            {{ form.pais.errors }}
-            <label for="{{ form.sexo.id_for_label }}">País</label><br>
-            {{ form.pais }}
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-lg-4">
-            {{ form.email.errors }}
-            <label for="{{ form.email.id_for_label }}">Email *</label>
-            {{ form.email }}
-        </div>
-
-        <div class="col-lg-4">
-            {{ form.email_alternativo.errors }}
-            <label for="{{ form.email_alternativo.id_for_label }}">Email Alternativo</label>
-            {{ form.email_alternativo }}
+            {{ form.estado_oportunidad.errors }}
+            <label for="{{ form.estado_oportunidad.id_for_label }}">Estado *</label><br>
+            {{ form.estado_oportunidad }}
         </div>
 
         <div class="col-lg-4">
             {{ form.tipo.errors }}
-            <label for="{{ form.tipo.id_for_label }}">Tipo</label><br>
+            <label for="{{ form.sexo.id_for_label }}">Tipo *</label><br>
             {{ form.tipo }}
         </div>
     </div>
 
     <div class="row">
         <div class="col-lg-4">
-            {{ form.telefono.errors }}
-            <label for="{{ form.telefono.id_for_label }}">Teléfono</label>
-            {{ form.telefono }}
+            {{ form.cuenta.errors }}
+            <label for="{{ form.email.id_for_label }}">Cuenta *</label>
+            {{ form.cuenta }}
         </div>
 
         <div class="col-lg-4">
-            {{ form.telefono_alternativo.errors }}
-            <label for="{{ form.telefono_alternativo.id_for_label }}">Tel. Alternativo</label>
-            {{ form.telefono_alternativo }}
+            {{ form.fecha.errors }}
+            <label for="{{ form.fecha.id_for_label }}">Fecha *</label>
+            {{ form.fecha }}
         </div>
 
         <div class="col-lg-4">
-            {{ form.web.errors }}
-            <label for="{{ form.web.id_for_label }}">Web</label><br>
-            {{ form.web }}
+            {{ form.monto.errors }}
+            <label for="{{ form.tipo.id_for_label }}">Monto</label><br>
+            {{ form.monto }}
         </div>
     </div>
 
@@ -102,7 +92,7 @@
         </div>
         <div class="col-2 col-sm-2 col-md-2 col-lg-2"></div>
         <div class="col-2 col-sm-2 col-md-2 col-lg-2" style="padding-left: 2px; padding-right: 2px;">
-            <a class="btn btn-secondary" style="margin-top: 10px; margin-right: 40px;" href="/cuentas">Volver</a>
+            <a class="btn btn-secondary" style="margin-top: 10px; margin-right: 40px;" href="/oportunidades">Volver</a>
         </div>
         <div class="col-2 col-sm-2 col-md-2 col-lg-2" style="padding-left: 2px; padding-right: 2px;">
             <input class="btn btn-success" type="submit" value="Guardar" style="margin-top: 10px; margin-right: 40px;" /> 
